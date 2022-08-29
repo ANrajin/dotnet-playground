@@ -27,11 +27,20 @@
     {
     <script src="~/lib/filepond/filepond.min.js"></script>
     <script src="~/lib/filepond/plugins/image-preview/filepond-plugin-image-preview.min.js"></script>
+    <script src="~/lib/filepond/plugins/file-size-validate/filepond-plugin-file-validate-size.min.js"></script>
+    <script src="~/lib/filepond/plugins/file-type-validate/filepond-plugin-file-validate-type.min.js"></script>
     <script>
         FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.registerPlugin(FilePondPluginFileValidateSize);
+        FilePond.registerPlugin(FilePondPluginFileValidateType);
+
         const inputElement = document.querySelector('input[type="file"]');
         let ApiUrl = "/api/filepond/"
         const pond = FilePond.create(inputElement, {
+            maxFiles: 5,
+            allowFileSizeValidation: true,
+            allowFileTypeValidation: true,
+            maxFileSize: "1MB",
             server: {
                 url: ApiUrl,
             }
