@@ -15,29 +15,29 @@ namespace FilesHandling.Test.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Process(IFormFile file, CancellationToken cancellationToken)
+        public async Task<ActionResult> Process(IFormFile files, CancellationToken cancellationToken)
         {
+            var folder = Guid.NewGuid().ToString();
+            // full path to file in temp location
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, $"tmp/{folder}");
+            Directory.CreateDirectory(Path.Combine(_webHostEnvironment.WebRootPath, filePath));
+
             try
             {
-                var guid = Guid.NewGuid().ToString();
-                var originalName = file.FileName.Split('.').LastOrDefault();
-                var newimage = string.Format("{0}.{1}", guid, originalName);
+                var fileName = files.FileName;
 
                 using var newMemoryStream = new MemoryStream();
-                await file.CopyToAsync(newMemoryStream, cancellationToken);
+                await files.CopyToAsync(newMemoryStream, cancellationToken);
 
-                if (file.Length > 0)
+                if (files.Length > 0)
                 {
-                    // full path to file in temp location
-                    var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "public");
-
-                    using (var stream = new FileStream(Path.Combine(filePath, newimage), FileMode.Create))
+                    using (var stream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
                     {
-                        await file.CopyToAsync(stream);
+                        await files.CopyToAsync(stream);
                     }
                 }
 
-                return Ok(newimage);
+                return Ok(folder);
             }
             catch (Exception e)
             {
@@ -51,14 +51,14 @@ namespace FilesHandling.Test.Controllers
             using StreamReader reader = new(Request.Body, Encoding.UTF8);
             string guid = await reader.ReadToEndAsync();
 
-            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "public");
+            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "tmp");
             var filePath = Path.Combine(folderPath, guid.ToString());
 
             FileInfo file = new FileInfo(filePath);
 
-            if (file.Exists)//check file exsit or not  
+            if (Directory.Exists(filePath))//check file exsit or not  
             {
-                file.Delete();
+                Directory.Delete(filePath, true);
             }
 
             return Ok();

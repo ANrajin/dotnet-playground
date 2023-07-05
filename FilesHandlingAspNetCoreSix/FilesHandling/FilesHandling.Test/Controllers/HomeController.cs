@@ -23,6 +23,14 @@ namespace FilesHandling.Test.Controllers
             return View();
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult Store(FileHandlerModel model)
+        {
+            if (ModelState.IsValid)
+                Console.WriteLine("hello");
+            return RedirectToAction("FilePond");
+        }
+
         public IActionResult Privacy()
         {
             return View();

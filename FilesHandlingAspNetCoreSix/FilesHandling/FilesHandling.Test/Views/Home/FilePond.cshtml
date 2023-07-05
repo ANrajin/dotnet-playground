@@ -1,4 +1,5 @@
-﻿@{
+﻿@model FileHandlerModel
+@{
     ViewData["Title"] = "FilePond";
 }
 
@@ -11,14 +12,18 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 mx-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="text-center text-primary">FilePond Plugin</h4>
+                <form method="post" asp-controller="home" asp-action="store" asp-antiforgery="true">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="text-center text-primary">FilePond Plugin</h4>
+                        </div>
+                        <div class="card-body">
+                            <input type="file" class="filepond" id="filepond" asp-for="Files" multiple />
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <input type="file" class="filepond" id="filepond" name="file" multiple />
-                    </div>
-                </div>
+
+                    <button type="submit">Save</button>
+                </form>
             </div>
         </div>
     </div>
@@ -34,7 +39,7 @@
         FilePond.registerPlugin(FilePondPluginFileValidateSize);
         FilePond.registerPlugin(FilePondPluginFileValidateType);
 
-        const inputElement = document.querySelector('input[type="file"]');
+        const inputElement = document.querySelector('input[id="filepond"]');
         let ApiUrl = "/api/filepond/"
         const pond = FilePond.create(inputElement, {
             maxFiles: 5,
@@ -50,6 +55,9 @@
             server: {
                 url: "/api/filepond/",
                 process: (fieldName, file, metadata, load, error, progress, abort) => {
+                    console.log(fieldName);
+                    console.log(file);
+                    console.log(metadata);
                     const formData = new FormData();
                     formData.append(fieldName, file, file.name);
 
